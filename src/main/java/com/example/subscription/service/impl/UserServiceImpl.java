@@ -15,10 +15,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
-    public User findUserByEmail(String email){
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        return userOptional.orElse(null);
-    }
+//    public User findUserByEmail(String email){
+//        Optional<User> userOptional = userRepository.findByEmail(email);
+//        return userOptional.orElse(null);
+//    }
 
     public boolean emailExists(String email){
         return userRepository.findByEmail(email).isPresent();

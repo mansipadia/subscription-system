@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.sugarfit</groupId>
-	<artifactId>subscription-system</artifactId>
+	<artifactId>subscription</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>subscription-system</name>
+	<name>subscription</name>
 	<description>Demo project for Spring Boot - Subscription management system</description>
 	<url/>
 	<licenses>
@@ -66,6 +66,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>subscription</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

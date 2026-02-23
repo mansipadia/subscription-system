@@ -1,6 +1,5 @@
 package com.example.subscription.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -40,7 +39,6 @@ public class User {
     private String email;
 
     @Size(max = 255)
-    @Column(length = 255)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
