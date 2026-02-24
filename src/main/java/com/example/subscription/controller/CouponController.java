@@ -1,8 +1,12 @@
 package com.example.subscription.controller;
 
+import com.example.subscription.DTO.CouponRequest;
+import com.example.subscription.DTO.CouponResponse;
 import com.example.subscription.entity.Coupon;
 import com.example.subscription.service.CouponService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,19 +22,18 @@ public class CouponController {
     private CouponService couponService;
 
     @PostMapping("/coupons")
-    public ResponseEntity<Coupon> addCoupon(@RequestBody Coupon coupon) {
-        return ResponseEntity.ok(couponService.saveCouponData(coupon));
+    public ResponseEntity<CouponResponse> addCoupon(@Valid @RequestBody CouponRequest request) {
+        CouponResponse response = couponService.saveCouponData(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/coupons")
-    public ResponseEntity<List<Coupon>> getAllCoupon() {
+    public ResponseEntity<List<CouponResponse>> getAllCoupon() {
         return ResponseEntity.ok(couponService.getAllCoupons());
     }
 
-    @GetMapping("coupons/{id}")
-    public ResponseEntity<Coupon> getCouponById(@PathVariable Long id) {
-        return couponService.getCouponsById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/coupons/{id}")
+    public ResponseEntity<CouponResponse> getCouponById(@PathVariable Long id) {
+        return ResponseEntity.ok(couponService.getCouponsById(id));
     }
 }
