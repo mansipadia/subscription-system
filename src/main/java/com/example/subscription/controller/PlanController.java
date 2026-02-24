@@ -1,15 +1,17 @@
 package com.example.subscription.controller;
 
 
-import com.example.subscription.entity.Plan;
+import com.example.subscription.DTO.CreatePlanRequest;
+import com.example.subscription.DTO.PlanResponse;
+import com.example.subscription.DTO.UpdatePlanRequest;
 import com.example.subscription.service.PlanService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -19,44 +21,26 @@ public class PlanController {
     PlanService planService;
 
     @PostMapping("/plans")
-    public ResponseEntity addPlan(@RequestBody Plan plan){
-        try{
-            planService.savePlanData(plan);
-            return new ResponseEntity(HttpStatusCode.valueOf(200));
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(HttpStatusCode.valueOf(500));
-        }
+    public ResponseEntity<?> addPlan(@Valid @RequestBody CreatePlanRequest request){
+        PlanResponse response = planService.savePlanData(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/plans")
-    public ResponseEntity<List<Plan>> getAllPlans(){
-        try{
-            return new ResponseEntity<>(planService.getAllPlan(),HttpStatusCode.valueOf(200));
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(HttpStatusCode.valueOf(500));
-        }
+    public ResponseEntity<List<PlanResponse>> getAllPlans(){
+        return ResponseEntity.ok(planService.getAllPlan());
     }
 
     @GetMapping("/plans/{id}")
-    public ResponseEntity<Optional<Plan>> getPlanById(@PathVariable("id") Long id){
-        try {
-            return new ResponseEntity<>(planService.getPlansById(id),HttpStatusCode.valueOf(200));
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatusCode.valueOf(500));
-        }
+    public ResponseEntity<PlanResponse> getPlanById(@PathVariable("id") Long id){
+        return ResponseEntity.ok(planService.getPlansById(id));
     }
 
     @PutMapping("/plans/{id}")
-    public ResponseEntity<Plan> updatePlan(@PathVariable Long id, @RequestBody Plan updatedPlan){
-        try {
-            return planService.updatePlanById(id,updatedPlan)
-                    .map(plan -> ResponseEntity.ok(plan))
-                    .orElse(ResponseEntity.notFound().build());
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(HttpStatusCode.valueOf(500));
+    public ResponseEntity<PlanResponse> updatePlan(@PathVariable Long id,@Valid @RequestBody UpdatePlanRequest request){
+
+        return ResponseEntity.ok(planService.updatePlanById(id,request));
+
         }
     }
-}
+

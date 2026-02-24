@@ -1,8 +1,12 @@
 package com.example.subscription.controller;
 
+import com.example.subscription.DTO.CreateUserRequest;
+import com.example.subscription.DTO.UserResponse;
 import com.example.subscription.entity.User;
 import com.example.subscription.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,39 +22,18 @@ public class UserController {
     UserService userService;
 
     @PostMapping("/users")
-    public ResponseEntity addUser(@RequestBody User user){
-        try{
-            userService.saveUserData(user);
-            return new ResponseEntity<>(HttpStatusCode.valueOf(200));
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatusCode.valueOf(500));
-        }
+    public ResponseEntity<UserResponse> addUser(@Valid  @RequestBody CreateUserRequest request){
+            UserResponse response = userService.saveUserData(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getAllUsers(){
-
-        try{
-            return new ResponseEntity<>(userService.getUserData(), HttpStatusCode.valueOf(200));
-
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatusCode.valueOf(500));
-        }
-
-
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.getUserData());
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<Optional<User>> getUserById(@PathVariable("id") Integer id){
-
-        try{
-            return new ResponseEntity<>(userService.getUserDataById(id),HttpStatusCode.valueOf(200));
-        }
-        catch (Exception e){
-            return new ResponseEntity<>(HttpStatusCode.valueOf(500));
-        }
-
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserDataById(id));
     }
-
 }
