@@ -75,6 +75,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscriptionRepository.save(subscription);
 
         paymentService.processPayment(subscription.getId(), finalPrice, method,PaymentType.SUBSCRIPTION);
+
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscriptionRepository.save(subscription);
         return mapToResponse(subscription);
     }
 

@@ -2,10 +2,7 @@ package com.example.subscription.entity;
 
 import com.example.subscription.enums.SubscriptionStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -43,7 +40,7 @@ public class Subscription {
     @Enumerated(value = EnumType.STRING)
     private SubscriptionStatus status;
 
-    private Boolean auto_renew = true;
+    private Boolean autoRenew = true;
 
     @Column(precision = 10,scale = 2)
     private BigDecimal finalPrice;

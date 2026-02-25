@@ -5,7 +5,6 @@ import com.example.subscription.enums.PaymentType;
 import com.example.subscription.entity.Subscription;
 import com.example.subscription.enums.PaymentMethod;
 import com.example.subscription.enums.PaymentStatus;
-import com.example.subscription.enums.SubscriptionStatus;
 import com.example.subscription.exception.PaymentFailedException;
 import com.example.subscription.exception.ResourceNotFoundException;
 import com.example.subscription.repository.PaymentRepository;
@@ -14,6 +13,7 @@ import com.example.subscription.service.PaymentGatewaySimulator;
 import com.example.subscription.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -33,7 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     SubscriptionRepository subscriptionRepository;
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Payment processPayment(Long subscriptionId, BigDecimal amount,PaymentMethod method,PaymentType type) {
 
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
