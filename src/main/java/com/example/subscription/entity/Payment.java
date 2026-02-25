@@ -2,6 +2,7 @@ package com.example.subscription.entity;
 
 import com.example.subscription.enums.PaymentMethod;
 import com.example.subscription.enums.PaymentStatus;
+import com.example.subscription.enums.PaymentType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -29,11 +30,10 @@ public class Payment {
     @Column(precision = 10,scale = 2)
     private BigDecimal amount;
 
-    @Size(max = 30)
+    @NotNull
     @Enumerated(value = EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    @Size(max = 20)
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus paymentStatus;
 
@@ -56,12 +56,5 @@ public class Payment {
 
 
     private LocalDate refundDate;
-
-
-
-
-
-
-
 
 }

@@ -36,7 +36,7 @@ public class PlanController {
         return ResponseEntity.ok(planService.getPlansById(id));
     }
 
-    @PutMapping("/plans/{id}")
+    @PutMapping("/plans/{id}/change-plan")
     public ResponseEntity<PlanResponse> updatePlan(@PathVariable Long id,@Valid @RequestBody UpdatePlanRequest request){
 
         return ResponseEntity.ok(planService.updatePlanById(id,request));

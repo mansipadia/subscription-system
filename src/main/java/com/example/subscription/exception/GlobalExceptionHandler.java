@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends RuntimeException{
@@ -48,6 +49,18 @@ public class GlobalExceptionHandler extends RuntimeException{
                         message
                 )
         );
+    }
+
+    @ExceptionHandler(PaymentFailedException.class)
+    public ResponseEntity<?> handlePaymentFailed(PaymentFailedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of(
+                        "timestamp", LocalDateTime.now(),
+                        "status", 400,
+                        "error", "Payment Failed",
+                        "message", ex.getMessage()
+                ));
     }
 
 }

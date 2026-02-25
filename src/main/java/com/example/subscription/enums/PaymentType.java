@@ -1,4 +1,4 @@
-package com.example.subscription.entity;
+package com.example.subscription.enums;
 
 public enum PaymentType {
     SUBSCRIPTION,

@@ -4,5 +4,4 @@ public enum PaymentMethod {
     CARD,
     UPI,
     WALLET,
-    AUTO_RENEWAL
 }

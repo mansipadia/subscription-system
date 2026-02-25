@@ -41,7 +41,6 @@ public class Subscription {
     private LocalDate endDate;
 
     @Enumerated(value = EnumType.STRING)
-    @Size(max = 20)
     private SubscriptionStatus status;
 
     private Boolean auto_renew = true;
