@@ -17,8 +17,13 @@ import java.util.List;
 @RequestMapping("/api")
 public class PlanController {
 
-    @Autowired
-    PlanService planService;
+
+    private final PlanService planService;
+
+    public PlanController(PlanService planService) {
+        this.planService = planService;
+    }
+
 
     @PostMapping("/plans")
     public ResponseEntity<?> addPlan(@Valid @RequestBody CreatePlanRequest request){

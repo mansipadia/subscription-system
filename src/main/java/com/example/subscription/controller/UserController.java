@@ -18,8 +18,11 @@ import java.util.Optional;
 @RequestMapping("/api")
 public class UserController {
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/users")
     public ResponseEntity<UserResponse> addUser(@Valid  @RequestBody CreateUserRequest request){
