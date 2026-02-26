@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -26,5 +27,16 @@ public interface SubscriptionRepository extends JpaRepository<Subscription,Long>
     List<Subscription> findDueSubscriptions(
             @Param("status") SubscriptionStatus status,
             @Param("today") LocalDate today
+    );
+
+    @Query("""
+       SELECT s FROM Subscription s
+       JOIN FETCH s.user
+       WHERE s.status = :status
+       AND s.nextRetryDate <= :time
+       """)
+    List<Subscription> findSubscriptionsForRetry(
+            @Param("status") SubscriptionStatus status,
+            @Param("time") LocalDate date
     );
 }

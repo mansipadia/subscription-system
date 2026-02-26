@@ -59,9 +59,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         if (couponCode != null){
             coupon = validateCoupon(couponCode,user);
             finalPrice = applyDiscount(finalPrice,coupon);
-            incrementCouponUsage(coupon,user);
-
         }
+
 
         Subscription subscription = new Subscription();
 
@@ -72,9 +71,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscription.setStatus(SubscriptionStatus.PENDING);
         subscription.setFinalPrice(finalPrice);
 
-        subscriptionRepository.save(subscription);
+        subscription = subscriptionRepository.saveAndFlush(subscription);
 
-        paymentService.processPayment(subscription.getId(), finalPrice, method,PaymentType.SUBSCRIPTION);
+        paymentService.processPayment(subscription.getId(), finalPrice, method,type);
+
+        if (coupon != null) {
+            incrementCouponUsage(coupon, user);
+        }
 
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         subscriptionRepository.save(subscription);
@@ -87,9 +90,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         coupon.setUsedCount(coupon.getUsedCount() + 1);
         couponRepository.save(coupon);
 
-        CouponUsage usage = new CouponUsage();
-        usage.setCoupon(coupon);
-        usage.setUser(user);
+        CouponUsage usage = couponUsageRepository.findByUserAndCoupon(user, coupon).orElse(null);
+
+        if (usage == null){
+            usage = new CouponUsage();
+            usage.setCoupon(coupon);
+            usage.setUser(user);
+            usage.setUsageCount(1);
+        }
+        else {
+            usage.setUsageCount(usage.getUsageCount() +1);
+        }
+
 
         couponUsageRepository.save(usage);
     }
@@ -116,12 +128,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             throw  new BadRequestException("Coupon Expired..");
         }
 
-        if (coupon.getUsageLimit() <= coupon.getUsedCount()){
-            throw new ConflictException("All Coupon used...");
+        if (coupon.getUsedCount() >= coupon.getUsageLimit()) {
+            throw new ConflictException("Coupon usage limit reached");
         }
 
-        if (couponUsageRepository.countByCouponAndUser(coupon,user) >= coupon.getUsageLimit()){
-            throw new ConflictException("User already used coupon");
+        CouponUsage usage = couponUsageRepository
+                .findByUserAndCoupon(user, coupon)
+                .orElse(null);
+
+        if (usage != null && usage.getUsageCount() >= 1) {
+            throw new ConflictException("User already used this coupon");
         }
         return coupon;
 
