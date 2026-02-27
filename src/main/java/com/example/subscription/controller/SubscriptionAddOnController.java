@@ -23,7 +23,7 @@ public class SubscriptionAddOnController {
     }
 
     @PostMapping("/{id}/add-ons/{addOnId}/usage")
-    public SubscriptionAddOns recordUsage(@PathVariable Long id, @PathVariable Long addOnId, @RequestBody UsageRequest request){
+    public SubscriptionAddOnResponse recordUsage(@PathVariable Long id, @PathVariable Long addOnId, @RequestBody UsageRequest request){
         return subscriptionAddOnService.recordUsage(id,addOnId,request);
     }
 

@@ -106,7 +106,7 @@ public class SubscriptionAddOnServiceTest {
         when(subscriptionAddOnRepository.save(any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        SubscriptionAddOns updated =
+        SubscriptionAddOnResponse updated =
                 service.recordUsage(1L, 10L, request);
 
         assertEquals(15, updated.getUnitsUsed());

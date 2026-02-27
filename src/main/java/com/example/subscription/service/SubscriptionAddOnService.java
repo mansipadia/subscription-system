@@ -12,7 +12,7 @@ public interface SubscriptionAddOnService {
 
     SubscriptionAddOnResponse attachAddOn(Long subscriptionId, AttachAddOnRequest request);
 
-    SubscriptionAddOns recordUsage(Long subscriptionAddOnId, Long addOnId ,UsageRequest request);
+    SubscriptionAddOnResponse recordUsage(Long subscriptionAddOnId, Long addOnId ,UsageRequest request);
 
     List<SubscriptionAddOns> getSubscriptionAddOns(Long subscriptionId);
 

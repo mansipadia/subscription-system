@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -51,6 +52,14 @@ public class SubscriptionAddOnServiceImpl implements SubscriptionAddOnService {
         subscriptionAddOns.setBillingCycleStart(startDate);
         subscriptionAddOns.setBillingCycleEnd(endDate);
 
+        if (subscriptionAddOnRepository
+                .existsBySubscription_IdAndAddOns_IdAndBillingCycleStart(
+                        subscriptionId,
+                        request.getAddOnId(),
+                        startDate
+                )) {
+            throw new IllegalStateException("Add-on already attached for this cycle");
+        }
         SubscriptionAddOns saved = subscriptionAddOnRepository.save(subscriptionAddOns);
 
         // Convert to DTO
@@ -68,21 +77,39 @@ public class SubscriptionAddOnServiceImpl implements SubscriptionAddOnService {
     }
 
     @Override
-    public SubscriptionAddOns recordUsage(Long subscriptionId,
-                                          Long addOnId,
-                                          UsageRequest request) {
+    public SubscriptionAddOnResponse recordUsage(Long subscriptionId,
+                                                 Long addOnId,
+                                                 UsageRequest request) {
+
+        Subscription subscription = subscriptionRepository.findById(subscriptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription not found"));
+
+        LocalDate startDate = subscription.getStartDate();
 
         SubscriptionAddOns addOn = subscriptionAddOnRepository
                 .findBySubscription_IdAndAddOns_IdAndBillingCycleStart(
                         subscriptionId,
                         addOnId,
-                        LocalDate.now().withDayOfMonth(1)
+                        startDate
                 )
                 .orElseThrow(() -> new ResourceNotFoundException("Add-on not attached"));
 
         addOn.setUnitsUsed(addOn.getUnitsUsed() + request.getUnits());
 
-        return subscriptionAddOnRepository.save(addOn);
+        SubscriptionAddOns saved = subscriptionAddOnRepository.save(addOn);
+
+        // Convert to DTO
+        SubscriptionAddOnResponse response = new SubscriptionAddOnResponse();
+        response.setId(saved.getId());
+        response.setSubscriptionId(saved.getSubscription().getId());
+        response.setAddOnId(saved.getAddOns().getId());
+        response.setAddOnName(saved.getAddOns().getName());
+        response.setUnitsIncluded(saved.getUnitsIncluded());
+        response.setUnitsUsed(saved.getUnitsUsed());
+        response.setBillingCycleStart(saved.getBillingCycleStart());
+        response.setBillingCycleEnd(saved.getBillingCycleEnd());
+
+        return response;
     }
 
     @Override

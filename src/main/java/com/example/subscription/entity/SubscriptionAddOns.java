@@ -10,8 +10,16 @@ import java.time.LocalDate;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(
-        columnNames = {"subscription_id,add_on_id,billing_cycle_start"}))
+@Table(
+        name = "subscription_add_ons",
+        uniqueConstraints = @UniqueConstraint(
+                columnNames = {
+                        "subscription_id",
+                        "add_on_id",
+                        "billing_cycle_start"
+                }
+        )
+)
 public class SubscriptionAddOns {
 
     @Id

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,5 +17,10 @@ public interface SubscriptionAddOnRepository extends JpaRepository<SubscriptionA
 
     Optional<SubscriptionAddOns> findBySubscription_IdAndAddOns_IdAndBillingCycleStart(Long subscriptionId, Long addOnId, LocalDate billingCycleStart);
 
-    Optional<SubscriptionAddOns> findBySubscriptionIdAndAddOnsId(Long subscriptionId, Long addOnId);
+    boolean existsBySubscription_IdAndAddOns_IdAndBillingCycleStart(
+            Long subscriptionId,
+            Long addOnId,
+            LocalDate billingCycleStart
+    );
+
 }
