@@ -3,7 +3,6 @@ package com.example.subscription.controller;
 import com.example.subscription.DTO.PaymentRequest;
 import com.example.subscription.DTO.RefundRequest;
 import com.example.subscription.entity.Payment;
-import com.example.subscription.entity.Subscription;
 import com.example.subscription.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -1,7 +1,6 @@
 package com.example.subscription.DTO;
 
 import com.example.subscription.enums.PaymentType;
-import com.example.subscription.entity.Subscription;
 import com.example.subscription.enums.PaymentMethod;
 import com.example.subscription.enums.PaymentStatus;
 import lombok.Data;

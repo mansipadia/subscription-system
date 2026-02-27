@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -98,7 +97,6 @@ public class SubscriptionAddOnServiceImpl implements SubscriptionAddOnService {
 
         SubscriptionAddOns saved = subscriptionAddOnRepository.save(addOn);
 
-        // Convert to DTO
         SubscriptionAddOnResponse response = new SubscriptionAddOnResponse();
         response.setId(saved.getId());
         response.setSubscriptionId(saved.getSubscription().getId());

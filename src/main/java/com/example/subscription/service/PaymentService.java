@@ -1,7 +1,6 @@
 package com.example.subscription.service;
 
 import com.example.subscription.entity.Payment;
-import com.example.subscription.entity.Subscription;
 import com.example.subscription.enums.PaymentMethod;
 import com.example.subscription.enums.PaymentType;
 

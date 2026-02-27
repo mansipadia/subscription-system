@@ -3,7 +3,6 @@ package com.example.subscription.controller;
 import com.example.subscription.DTO.ChangePlanRequest;
 import com.example.subscription.DTO.SubscriptionRequest;
 import com.example.subscription.DTO.SubscriptionResponse;
-import com.example.subscription.enums.PaymentMethod;
 import com.example.subscription.service.SubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
