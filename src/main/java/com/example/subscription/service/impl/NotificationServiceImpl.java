@@ -10,8 +10,8 @@ import java.time.LocalDate;
 public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendDunningNotification(User user, int attempts, int max, LocalDate nextRetry) {
-        System.out.println("Dunning Email : " +user.getEmail()+ ", attempt "+attempts+
-                " of " + max + ", next retry "+nextRetry);
+//        System.out.println("Dunning Email : " +user.getEmail()+ ", attempt "+attempts+
+//                " of " + max + ", next retry "+nextRetry);
     }
 
     @Override

@@ -108,12 +108,31 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     private BigDecimal applyDiscount(BigDecimal price, Coupon coupon) {
 
-        if (coupon.getType() == CouponType.PERCENTAGE){
-            return price.subtract(price.multiply(coupon.getDiscountPercentage().divide(BigDecimal.valueOf(100))));
+        BigDecimal finalPrice =price;
+
+        switch (coupon.getType()){
+            case PERCENTAGE:
+                finalPrice= price.subtract(price.multiply(coupon.getDiscountPercentage().divide(BigDecimal.valueOf(100))));
+                break;
+            case AMOUNT:
+                finalPrice = price.subtract(coupon.getDiscountAmount());
+                break;
+            case BOTH:
+                BigDecimal percentageDis = price.multiply(coupon.getDiscountPercentage().divide(BigDecimal.valueOf(100)));
+
+                BigDecimal afterPercentage =price.subtract(percentageDis);
+
+                finalPrice = afterPercentage.subtract(coupon.getDiscountAmount());
+                break;
+            case FREE_TRIAL:
+                finalPrice = BigDecimal.ZERO;
+                break;
         }
-        else {
-            return price.subtract(coupon.getDiscountAmount());
+
+        if (finalPrice.compareTo(BigDecimal.ZERO) < 0){
+            finalPrice = BigDecimal.ZERO;
         }
+        return finalPrice.setScale(2,RoundingMode.HALF_UP);
     }
 
     private Coupon validateCoupon(String code, User user) {
@@ -181,12 +200,16 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         Plan newPlan = planRepository.findById(newPlanId)
                 .orElseThrow(() -> new ResourceNotFoundException("New plan not found"));
 
-        long remainingDays = Math.max(0, ChronoUnit.DAYS.between(LocalDate.now(), subscription.getEndDate()));
+        long remainingDays = ChronoUnit.DAYS.between(LocalDate.now(), subscription.getEndDate());
+        remainingDays = Math.max(0, remainingDays);
+
         long totalDays = subscription.getPlan().getDuration_days();
+
+        remainingDays = Math.min(remainingDays, totalDays);
 
         BigDecimal credit = subscription.getPlan().getPrice()
                 .multiply(BigDecimal.valueOf(remainingDays))
-                .divide(BigDecimal.valueOf(totalDays),2, RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(totalDays), 2, RoundingMode.HALF_UP);
 
         BigDecimal upgradeAmount = newPlan.getPrice().subtract(credit);
 
@@ -223,8 +246,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
 
         subscription.setPlan(newPlan);
-        subscription.setEndDate(subscription.getEndDate().plusDays(newPlan.getDuration_days()));
+        subscription.setStartDate(LocalDate.now());
+        subscription.setEndDate(LocalDate.now().plusDays(newPlan.getDuration_days()));
         subscription.setStatus(SubscriptionStatus.ACTIVE);
+
+
         subscription.setFinalPrice(newPlan.getPrice());
 
         subscriptionRepository.save(subscription);

@@ -33,7 +33,7 @@ public class PaymentServiceImpl implements PaymentService {
     SubscriptionRepository subscriptionRepository;
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Payment processPayment(Long subscriptionId, BigDecimal amount,PaymentMethod method,PaymentType type) {
 
         Subscription subscription = subscriptionRepository.findById(subscriptionId)
