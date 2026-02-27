@@ -91,16 +91,29 @@ public class SubscriptionAddOnServiceTest {
     @Test
     void shouldRecordUsageSuccessfully() {
 
+        Subscription subscription = new Subscription();
+        subscription.setId(1L);
+        subscription.setStartDate(LocalDate.of(2025,1,1));
+
+        AddOns addOns = new AddOns();
+        addOns.setId(10L);
+        addOns.setName("Extra Storage");
+
         SubscriptionAddOns addOn = new SubscriptionAddOns();
+        addOn.setSubscription(subscription);
+        addOn.setAddOns(addOns);
         addOn.setUnitsUsed(10);
         addOn.setUnitsIncluded(50);
 
         UsageRequest request = new UsageRequest();
         request.setUnits(5);
 
+        when(subscriptionRepository.findById(1L))
+                .thenReturn(Optional.of(subscription));
+
         when(subscriptionAddOnRepository
                 .findBySubscription_IdAndAddOns_IdAndBillingCycleStart(
-                        anyLong(), anyLong(), any()))
+                        eq(1L), eq(10L), any()))
                 .thenReturn(Optional.of(addOn));
 
         when(subscriptionAddOnRepository.save(any()))
@@ -110,17 +123,25 @@ public class SubscriptionAddOnServiceTest {
                 service.recordUsage(1L, 10L, request);
 
         assertEquals(15, updated.getUnitsUsed());
+        assertEquals(1L, updated.getSubscriptionId());
+        assertEquals(10L, updated.getAddOnId());
     }
-
     @Test
     void shouldThrowIfAddOnNotAttached() {
+
+        Subscription subscription = new Subscription();
+        subscription.setId(1L);
+        subscription.setStartDate(LocalDate.of(2025,1,1));
 
         UsageRequest request = new UsageRequest();
         request.setUnits(5);
 
+        when(subscriptionRepository.findById(1L))
+                .thenReturn(Optional.of(subscription));
+
         when(subscriptionAddOnRepository
                 .findBySubscription_IdAndAddOns_IdAndBillingCycleStart(
-                        anyLong(), anyLong(), any()))
+                        eq(1L), eq(10L), any()))
                 .thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () ->

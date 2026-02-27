@@ -73,8 +73,12 @@ public class SubscriptionAddOnControllerTest {
         addOn.setUnitsUsed(50);
         addOn.setSubscription(subscription);
 
+        SubscriptionAddOnResponse response = new SubscriptionAddOnResponse();
+        response.setId(200L);
+        response.setUnitsUsed(50);
+
         when(subscriptionAddOnService.recordUsage(eq(1L), eq(10L), any()))
-                .thenReturn(addOn);
+                .thenReturn(response);
 
         UsageRequest request = new UsageRequest();
         request.setUnits(10);
