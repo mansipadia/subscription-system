@@ -32,14 +32,14 @@ class CouponUsageRepositoryTest {
         CouponUsage usage = new CouponUsage();
         usage.setUser(user);
         usage.setCoupon(coupon);
-        usage.setUsageCount(3); // IMPORTANT: only one row, count inside field
+        usage.setUsageCount(3);
         entityManager.persist(usage);
 
         entityManager.flush();
 
         long count = repository.countByCouponAndUser(coupon, user);
 
-        assertThat(count).isEqualTo(1); // only one DB row
+        assertThat(count).isEqualTo(1);
     }
 
     @Test
