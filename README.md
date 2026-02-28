@@ -1,5 +1,5 @@
 
-# 🚀 Subscription Management & Billing System
+# 🚀 Subscription Management System
 
 ## 📌 Project Overview
 
