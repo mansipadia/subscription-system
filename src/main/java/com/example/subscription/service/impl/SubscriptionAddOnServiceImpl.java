@@ -1,8 +1,6 @@
 package com.example.subscription.service.impl;
 
-import com.example.subscription.DTO.AttachAddOnRequest;
-import com.example.subscription.DTO.SubscriptionAddOnResponse;
-import com.example.subscription.DTO.UsageRequest;
+import com.example.subscription.DTO.*;
 import com.example.subscription.entity.AddOns;
 import com.example.subscription.entity.Subscription;
 import com.example.subscription.entity.SubscriptionAddOns;
@@ -17,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +30,8 @@ public class SubscriptionAddOnServiceImpl implements SubscriptionAddOnService {
 
     @Autowired
     AddOnRepository addOnRepository;
+
+
 
 
     @Override
@@ -121,21 +122,56 @@ public class SubscriptionAddOnServiceImpl implements SubscriptionAddOnService {
     }
 
     @Override
-    public BigDecimal calculateCurrentCycleCharges(Long subscriptionId) {
-        List<SubscriptionAddOns> addOns = getSubscriptionAddOns(subscriptionId);
+    public AddOnBillingResponse calculateCurrentCycleCharges(Long subscriptionId) {
 
+        List<SubscriptionAddOns> addons =
+                subscriptionAddOnRepository.findBySubscriptionId(subscriptionId);
+
+        List<AddOnBillingItem> billingItems = new ArrayList<>();
         BigDecimal total = BigDecimal.ZERO;
 
-        for (SubscriptionAddOns addOn:addOns){
+        LocalDate today = LocalDate.now();
+        BigDecimal amount=BigDecimal.ZERO;
 
-            int extraUnits = addOn.getUnitsUsed() - addOn.getUnitsIncluded();
+        for (SubscriptionAddOns subAddon : addons) {
 
-            if(extraUnits > 0){
-                BigDecimal extra = addOn.getAddOns().getUnitPrice().multiply(BigDecimal.valueOf(extraUnits));
-                total = total.add(extra);
+            if (today.isBefore(subAddon.getBillingCycleStart())
+                    || today.isAfter(subAddon.getBillingCycleEnd())) {
+                continue;
             }
 
+            int totalUsage = subAddon.getUnitsUsed();
+            int unitsIncluded = subAddon.getUnitsIncluded();
+
+            int billableUnits = Math.max(0, totalUsage - unitsIncluded);
+
+            amount = subAddon.getAddOns()
+                    .getUnitPrice()
+                    .multiply(BigDecimal.valueOf(billableUnits));
+
+            total = total.add(amount);
+
+            billingItems.add(new AddOnBillingItem(
+                    subAddon.getAddOns().getName(),
+                    totalUsage,
+                    unitsIncluded,
+                    billableUnits,
+                    subAddon.getAddOns().getUnitPrice(),
+                    total
+            ));
         }
-        return total;
+
+        Subscription subscription = subscriptionRepository.findById(subscriptionId)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription not found"));
+
+        BigDecimal grandTotal = subscription.getFinalPrice().add(total);
+
+
+        AddOnBillingResponse add=new AddOnBillingResponse();
+        add.setTotalAddOnCharge(amount);
+        add.setBillingItem(billingItems);
+        add.setGrandTotal( grandTotal);
+
+        return add;
     }
 }

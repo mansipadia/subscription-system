@@ -1,5 +1,6 @@
 package com.example.subscription.service;
 
+import com.example.subscription.DTO.AddOnBillingResponse;
 import com.example.subscription.DTO.AttachAddOnRequest;
 import com.example.subscription.DTO.SubscriptionAddOnResponse;
 import com.example.subscription.DTO.UsageRequest;
@@ -16,6 +17,6 @@ public interface SubscriptionAddOnService {
 
     List<SubscriptionAddOns> getSubscriptionAddOns(Long subscriptionId);
 
-    BigDecimal calculateCurrentCycleCharges(Long subscriptionId);
+    AddOnBillingResponse calculateCurrentCycleCharges(Long subscriptionId);
 
 }

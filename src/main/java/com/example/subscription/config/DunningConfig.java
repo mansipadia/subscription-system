@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 @ConfigurationProperties(prefix = "dunning")
 public class DunningConfig {
-    private int maxRetries;
+    private int maxRetries ;
     private int gracePeriodDays;
     private List<Integer> retryIntervalsHours;
     private Long schedulerIntervalMS;

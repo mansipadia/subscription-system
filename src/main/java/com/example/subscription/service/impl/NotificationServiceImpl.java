@@ -16,6 +16,6 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void sendExpirationNotification(User user) {
-        System.out.println("Subscription expired for : "+user.getEmail());
+//        System.out.println("Subscription expired for : "+user.getEmail());
     }
 }

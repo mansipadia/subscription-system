@@ -45,6 +45,10 @@ public class DunningServiceImpl implements DunningService {
             return;
         }
 
+        if (subscription.getRenewalAttempts() >= config.getMaxRetries()) {
+            return;
+        }
+
         int currentAttempts = subscription.getRenewalAttempts();
 
         if(LocalDate.now().isAfter(subscription.getGraceEndDate())){
@@ -65,25 +69,43 @@ public class DunningServiceImpl implements DunningService {
             createLog(subscription, currentAttempts+1,PaymentStatus.SUCCESS,null,null);
         }
         catch (Exception ex){
-            int newAttempt = currentAttempts +1;
+
+            int newAttempt = currentAttempts + 1;
 
             if (newAttempt >= config.getMaxRetries()){
+                subscription.setRenewalAttempts(newAttempt);
+                subscriptionRepository.save(subscription);
                 expire(subscription);
-                createLog(subscription, newAttempt, PaymentStatus.FAILED,ex.getMessage(),null);
+
+                createLog(subscription, newAttempt,
+                        PaymentStatus.FAILED,
+                        ex.getMessage(),
+                        null);
                 return;
             }
 
             int interval = config.getRetryIntervalsHours().get(newAttempt - 1);
 
-            LocalDate nextRetryDate = LocalDate.now().plusDays(interval/24);
+            LocalDate nextRetryDate =
+                    LocalDate.now().plusDays(interval / 24);
 
             subscription.setRenewalAttempts(newAttempt);
             subscription.setNextRetryDate(nextRetryDate);
 
-            createLog(subscription,newAttempt,PaymentStatus.FAILED,ex.getMessage(),nextRetryDate);
-            notificationService.sendDunningNotification(subscription.getUser(),newAttempt,config.getMaxRetries(),nextRetryDate);
-
             subscriptionRepository.save(subscription);
+
+            createLog(subscription,
+                    newAttempt,
+                    PaymentStatus.FAILED,
+                    ex.getMessage(),
+                    nextRetryDate);
+
+            notificationService.sendDunningNotification(
+                    subscription.getUser(),
+                    newAttempt,
+                    config.getMaxRetries(),
+                    nextRetryDate
+            );
         }
     }
 
@@ -92,6 +114,7 @@ public class DunningServiceImpl implements DunningService {
         subscription.setStatus(SubscriptionStatus.EXPIRED);
         subscription.setNextRetryDate(null);
         notificationService.sendExpirationNotification(subscription.getUser());
+        subscriptionRepository.save(subscription);
     }
 
     @Override

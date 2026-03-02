@@ -22,4 +22,6 @@ public interface SubscriptionAddOnRepository extends JpaRepository<SubscriptionA
             LocalDate billingCycleStart
     );
 
+    List<SubscriptionAddOns> findBySubscriptionId(Long subscriptionId);
+
 }
