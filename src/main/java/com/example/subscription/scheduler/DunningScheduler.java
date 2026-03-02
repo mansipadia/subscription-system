@@ -32,7 +32,7 @@ public class DunningScheduler {
     public void runDunning(){
 
         List<Subscription> subscriptions =
-                dunningLogRepository.findSubscriptionsForRetry(
+                subscriptionRepository.findSubscriptionsForRetry(
                         SubscriptionStatus.GRACE,
                         LocalDate.now(),
                         config.getMaxRetries()

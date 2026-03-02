@@ -8,6 +8,7 @@ import com.example.subscription.enums.PaymentMethod;
 import com.example.subscription.enums.PaymentStatus;
 import com.example.subscription.enums.PaymentType;
 import com.example.subscription.enums.SubscriptionStatus;
+import com.example.subscription.exception.PaymentFailedException;
 import com.example.subscription.repository.DunningLogRepository;
 import com.example.subscription.repository.PaymentRepository;
 import com.example.subscription.repository.SubscriptionRepository;
@@ -45,6 +46,7 @@ public class RenewalServiceImpl implements RenewalService {
     NotificationService notificationService;
 
     @Override
+    @Transactional(noRollbackFor = PaymentFailedException.class)
     public void processRenewal(Subscription subscription) {
 
         if (subscription.getStatus() != SubscriptionStatus.ACTIVE){
@@ -63,9 +65,17 @@ public class RenewalServiceImpl implements RenewalService {
 
             Payment payment = paymentService.processPayment(subscription.getId(), amount, PaymentMethod.CARD,PaymentType.RENEWAL);
 
-            subscription.setEndDate(subscription.getEndDate().plusDays(subscription.getPlan().getDuration_days()));
+            LocalDate baseDate = subscription.getEndDate().isAfter(LocalDate.now())
+                    ? subscription.getEndDate()
+                    : LocalDate.now();
+
+            subscription.setEndDate(
+                    baseDate.plusDays(subscription.getPlan().getDuration_days())
+            );
 
             subscription.setStatus(SubscriptionStatus.ACTIVE);
+            subscription.setRenewalAttempts(0);
+            subscription.setNextRetryDate(null);
 
             subscriptionRepository.save(subscription);
 

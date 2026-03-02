@@ -69,6 +69,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         subscription.setStartDate(LocalDate.now());
         subscription.setEndDate(LocalDate.now().plusDays(plan.getDuration_days()));
         subscription.setStatus(SubscriptionStatus.PENDING);
+        subscription.setCoupon(coupon);
         subscription.setFinalPrice(finalPrice);
 
         subscription = subscriptionRepository.saveAndFlush(subscription);

@@ -12,17 +12,17 @@ import java.util.List;
 public interface DunningLogRepository extends JpaRepository<DunningLog, Long> {
 
     List<DunningLog> findBySubscriptionId(Long subscriptionId);
-    @Query("""
-        SELECT s FROM Subscription s
-        WHERE s.status = :status
-        AND s.nextRetryDate IS NOT NULL
-        AND s.nextRetryDate <= :today
-        AND s.renewalAttempts < :maxRetries
-    """)
-    List<Subscription> findSubscriptionsForRetry(
-            SubscriptionStatus status,
-            LocalDate today,
-            int maxRetries
-    );
+//    @Query("""
+//        SELECT s FROM Subscription s
+//        WHERE s.status = :status
+//        AND s.nextRetryDate IS NOT NULL
+//        AND s.nextRetryDate <= :today
+//        AND s.renewalAttempts < :maxRetries
+//    """)
+//    List<Subscription> findSubscriptionsForRetry(
+//            SubscriptionStatus status,
+//            LocalDate today,
+//            int maxRetries
+//    );
 
 }

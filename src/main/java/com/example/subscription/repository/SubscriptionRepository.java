@@ -29,13 +29,15 @@ public interface SubscriptionRepository extends JpaRepository<Subscription,Long>
     );
 
     @Query("""
-       SELECT s FROM Subscription s
-       JOIN FETCH s.user
-       WHERE s.status = :status
-       AND s.nextRetryDate <= :time
-       """)
+        SELECT s FROM Subscription s
+        WHERE s.status = :status
+        AND s.nextRetryDate IS NOT NULL
+        AND s.nextRetryDate <= :today
+        AND s.renewalAttempts < :maxRetries
+    """)
     List<Subscription> findSubscriptionsForRetry(
-            @Param("status") SubscriptionStatus status,
-            @Param("time") LocalDate date
+            SubscriptionStatus status,
+            LocalDate today,
+            int maxRetries
     );
 }

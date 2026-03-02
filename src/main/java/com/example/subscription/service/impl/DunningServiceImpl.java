@@ -7,7 +7,9 @@ import com.example.subscription.enums.PaymentMethod;
 import com.example.subscription.enums.PaymentStatus;
 import com.example.subscription.enums.PaymentType;
 import com.example.subscription.enums.SubscriptionStatus;
+import com.example.subscription.exception.PaymentFailedException;
 import com.example.subscription.repository.DunningLogRepository;
+import com.example.subscription.repository.PaymentRepository;
 import com.example.subscription.repository.SubscriptionRepository;
 import com.example.subscription.service.DunningService;
 import com.example.subscription.service.NotificationService;
@@ -20,7 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
-@Transactional
+@Transactional(noRollbackFor = PaymentFailedException.class)
 public class DunningServiceImpl implements DunningService {
 
     @Autowired
@@ -38,8 +40,22 @@ public class DunningServiceImpl implements DunningService {
     @Autowired
     DunningConfig config;
 
+    @Autowired
+    PaymentRepository paymentRepository;
+
     @Override
     public void retryPayment(Subscription subscription) {
+
+        boolean alreadyRenewed =
+                paymentRepository.existsBySubscriptionIdAndPaymentTypeAndPaymentDate(
+                        subscription.getId(),
+                        PaymentType.RENEWAL,
+                        LocalDate.now()
+                );
+
+        if (alreadyRenewed) {
+            return;
+        }
 
         if (subscription.getStatus() != SubscriptionStatus.GRACE){
             return;
@@ -61,7 +77,13 @@ public class DunningServiceImpl implements DunningService {
             paymentService.processPayment(subscription.getId(),subscription.getPlan().getPrice(), PaymentMethod.CARD, PaymentType.RENEWAL);
 
             subscription.setStatus(SubscriptionStatus.ACTIVE);
-            subscription.setEndDate(subscription.getEndDate().plusDays(subscription.getPlan().getDuration_days()));
+            LocalDate baseDate = subscription.getEndDate().isAfter(LocalDate.now())
+                    ? subscription.getEndDate()
+                    : LocalDate.now();
+
+            subscription.setEndDate(
+                    baseDate.plusDays(subscription.getPlan().getDuration_days())
+            );
             subscription.setRenewalAttempts(0);
             subscription.setGraceEndDate(null);
             subscription.setNextRetryDate(null);
