@@ -1,312 +1,330 @@
-🚀 Subscription Management System (Spring Boot)
 
-A production-style SaaS Subscription Management System built with Spring Boot, supporting:
+# 🚀 Subscription Management System
 
-Subscription lifecycle
+## 📌 Project Overview
 
-Coupon engine
+This project is a **production-style Subscription Management System** built using Spring Boot.
 
-Auto-renewal
+It simulates how real-world subscription platforms (like Netflix, Sugarfit, stripe) handle:
 
-Dunning & retry mechanism
+* Plan-based billing
+* Automatic renewals
+* Payment processing (simulated)
+* Grace periods
+* Dunning & retry mechanism
+* Coupons & discounts
+* Plan upgrades and downgrades
+* Add-on billing
+* Transaction safety & idempotency
 
-Add-ons
+The system fully automates the subscription lifecycle and prevents common billing errors such as duplicate renewals or missed retries.
 
-Payment processing simulation
+---
 
-Scheduler-based billing automation
+# 🛠 Tech Stack
 
-Designed with clean architecture and fully testable service layers.
+* **Java 17**
+* **Spring Boot 3.x**
+* **Spring Data JPA (Hibernate)**
+* **MySQL**
+* **Maven**
+* **JUnit 5**
+* **Mockito**
+* **MockMvc**
+* **H2 (for repository tests)**
 
-🏗 Tech Stack
+---
 
-Java 17+
+# 🏗 Architecture
 
-Spring Boot
-
-Spring Data JPA
-
-Hibernate
-
-MySQL
-
-H2 (Testing)
-
-Mockito + JUnit 5
-
-MockMvc
-
-Lombok
-
-📦 Core Features
-👤 User Management
-
-Create user
-
-List users
-
-Get by ID
-
-📦 Plan Management
-
-Create plan
-
-Update plan
-
-Delete plan
-
-List available plans
-
-Each plan includes:
-
-Name
-
-Price
-
-Duration (days)
-
-🎟 Coupon Engine
-
-Supports:
-
-Percentage discounts
-
-Fixed amount discounts
-
-Expiry validation
-
-Global usage limit
-
-Per-user usage limit
-
-Active / inactive state
-
-Validations:
-
-Expired coupon
-
-Inactive coupon
-
-Limit exceeded
-
-Duplicate usage
-
-📑 Subscription Lifecycle
-
-Create subscription (with/without coupon)
-
-Cancel subscription
-
-Change plan (upgrade/downgrade)
-
-Proration logic
-
-Status handling:
-
-ACTIVE
-
-GRACE
-
-CANCELLED
-
-💳 Payment Module
-
-Simulated payment gateway.
-
-Supports:
-
-INITIATION
-
-RENEWAL
-
-UPGRADE
-
-REFUND
-
-Payment statuses:
-
-SUCCESS
-
-FAILED
-
-REFUNDED
-
-Includes idempotency checks.
-
-🔄 Auto Renewal
-
-Scheduled job:
-
-renewal.scheduler.interval-ms
-
-Renewal logic:
-
-Runs when subscription expires
-
-Skips already renewed subscriptions
-
-Extends end date on success
-
-Moves to GRACE on failure
-
-⚠ Dunning System
-
-Handles failed renewals.
-
-Configuration:
-
-dunning.max-retries=3
-dunning.grace-period-days=7
-dunning.retry-intervals-hours=24,48,72
-
-Flow:
-
-Renewal fails
-
-Status → GRACE
-
-Retry at configured intervals
-
-Cancel after max retries
-
-Log every attempt
-
-➕ Add-On Module
-
-Attach add-ons to subscription
-
-Track usage
-
-Include billing during renewal
-
-📊 Architecture
-
-Layered Architecture:
+Layered architecture:
 
 Controller → Service → Repository → Database
+Scheduler → Background Renewal & Dunning Jobs
 
-Separation of:
+### Layers
 
-Business logic (Service layer)
+* **Controller Layer** – Handles HTTP requests and validation
+* **Service Layer** – Business logic and transaction handling
+* **Repository Layer** – Database interactions
+* **Scheduler Layer** – Auto renewal and retry mechanisms
 
-HTTP layer (Controller)
+---
 
-Persistence (Repository)
+# ⚙️ Setup & Run Instructions
 
-Background jobs (Scheduler)
+## 1️⃣ Clone Repository
 
-🧪 Testing Strategy
-✅ Unit Tests (Mockito)
+```bash
+git clone <your-repo-url>
+cd subscription-system
+```
 
-SubscriptionService
+---
 
-CouponService
+## 2️⃣ Configure Database
 
-RenewalService
+Create a MySQL database:
 
-DunningService
+```sql
+CREATE DATABASE subscription_db;
+```
 
-PaymentService
+Update `application.properties`:
 
-🌐 Controller Tests (MockMvc)
-
-Request validation
-
-Status codes
-
-Error mapping
-
-🗄 Repository Tests (@DataJpaTest)
-
-Custom query validation
-
-Renewal and dunning queries
-
-Over 40+ business rule test cases.
-
-⚙ Configuration
-
-Example application.properties:
-
-spring.datasource.url=jdbc:mysql://localhost:3306/subscription
-spring.datasource.username=root
-spring.datasource.password=password
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/subscription_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
+```
+You can set environment variable for database connection
 
+---
+
+## 3️⃣ Run Application
+
+Using Maven wrapper:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Or:
+
+```bash
+mvn spring-boot:run
+```
+
+Application runs at:
+
+```
+http://localhost:8080
+```
+
+---
+
+# 🧪 Running Tests
+
+Run all tests:
+
+```bash
+./mvnw test
+```
+
+Expected output:
+
+```
+[INFO] BUILD SUCCESS
+```
+
+Tests include:
+
+* Unit tests (Mockito)
+* Controller tests (MockMvc)
+* Repository tests (@DataJpaTest with H2)
+
+---
+
+# 🔌 API Endpoints
+
+## 👤 User APIs
+
+| Method | Endpoint      | Description    |
+| ------ | ------------- | -------------- |
+| POST   | `/users`      | Create user    |
+| GET    | `/users`      | List users     |
+| GET    | `/users/{id}` | Get user by ID |
+
+---
+
+## 📦 Plan APIs
+
+| Method | Endpoint      | Description    |
+| ------ | ------------- | -------------- |
+| POST   | `/plans`      | Create plan    |
+| GET    | `/plans`      | List all plans |
+| GET    | `/plans/{id}` | Get plan by ID |
+| PUT    | `/plans/{id}` | Update plan    |
+
+---
+
+## 🎟 Coupon APIs
+
+| Method | Endpoint          | Description        |
+| ------ | ----------------- | ------------------ |
+| POST   | `/coupons`        | Create coupon      |
+| GET    | `/coupons`        | Create coupon      |
+| GET    | `/coupons/{code}` | Get coupon by code |
+
+---
+
+## 📑 Subscription APIs
+
+| Method | Endpoint                          | Description         |
+| ------ | --------------------------------- | ------------------- |
+| POST   | `/subscriptions`                  | Create subscription |
+| GET    | `/subscriptions`                  | Get subscription    |
+| GET    | `/subscriptions/{id}`             | Get subscription    |
+| PUT    | `/subscriptions/{id}/cancel`      | Cancel subscription |
+| PUT    | `/subscriptions/{id}/change-plan` | Upgrade/Downgrade   |
+
+---
+
+## 📑 Add-On APIs
+
+| Method | Endpoint                                        | Description                   |
+| ------ | ----------------------------------------------- | ----------------------------- |
+| POST   | `/add-ons`                                      | Create New Add-on             |
+| GET    | `/add-ons`                                      | Get AddOns                    |
+| POST   | `/subscriptions/{id}/add-ons`                   | Attach add-on to subscription |
+| PUT    | `/subscriptions/{id}/add-ons/{addOnId}`/usage   | Cancel subscription           |
+| PUT    | `/subscriptions/{id}/add-ons`                   | Upgrade/Downgrade             |
+
+---
+
+## 💳 Payment APIs
+
+| Method | Endpoint                      | Description                  |
+| ------ | ----------------------------- | ---------------------------- |
+| GET    | `/payments/subscription/{id}` | Get payments by subscription |
+| POST   | `/payments/{id}/refund`       | Refund payment               |
+
+---
+
+## 🔄 Admin / Scheduler APIs
+
+| Method | Endpoint                 | Description                  |
+| ------ | ------------------------ | ---------------------------- |
+| POST   | `/admin/trigger-renewal` | Manually trigger renewal job |
+| POST   | `/admin/trigger-dunning` | Manually trigger retry job   |
+
+---
+
+# ⚙️ Configuration Reference
+
+## Renewal Configuration
+
+```properties
 renewal.scheduler.interval-ms=3600000
+renewal.scheduler.enabled=true
+```
 
+---
+
+## Dunning Configuration
+
+```properties
 dunning.max-retries=3
 dunning.grace-period-days=7
 dunning.retry-intervals-hours=24,48,72
 dunning.scheduler.interval-ms=1800000
-▶ Running The Application
+```
 
-Clone repository
+### Dunning Logic
 
-Configure MySQL
+* If renewal payment fails:
 
-Run:
+  * Subscription → GRACE
+  * Retry based on configured intervals
+  * Cancel after max retries
 
-mvn spring-boot:run
+---
 
-Or from IDE.
+# 📬 Postman / Curl Examples
 
-🔬 Testing
+## 1️⃣ Create Plan
 
-Run all tests:
+```bash
+curl -X POST http://localhost:8080/plans \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Basic",
+  "price": 1000,
+  "durationDays": 30,
+  "description": "Basic monthly plan"
+  "price": 2000
+}'
+```
 
-mvn test
+---
 
-H2 database is used for repository tests.
+## 2️⃣ Create User
 
-📌 Important Business Scenarios Covered
+```bash
+curl -X POST http://localhost:8080/users \
+-H "Content-Type: application/json" \
+-d '{
+    "name":"Mansi",
+    "email":"mansi@gmail.com",
+    "password":"123456"
+}'
+```
 
-Prevent duplicate active subscription
+---
 
-Prevent double renewal (idempotency)
+## 3️⃣ Create Subscription
 
-Coupon validation matrix
+```bash
+curl -X POST http://localhost:8080/subscriptions \
+-H "Content-Type: application/json" \
+-d '{
+  "userId": 4,
+  "planId": 2,
+  "couponCode": "SAVE150",
+  "method": "UPI",
+  "type":"SUBSCRIPTION"
+}'
+```
 
-Grace period enforcement
+---
 
-Retry logic with configurable intervals
+## 4️⃣ Trigger Renewal
 
-Auto cancellation after failed retries
+```bash
+curl -X POST http://localhost:8080/admin/trigger-renewal
+```
 
-Refund handling during downgrade
+---
 
-🧠 Key Concepts Implemented
+## 5️⃣ Trigger Dunning
 
-Transaction management (REQUIRES_NEW)
+```bash
+curl -X POST http://localhost:8080/admin/trigger-dunning
+```
 
-Lazy loading handling
+---
 
-Scheduler-based automation
+Repository contains:
 
-Dunning retry strategies
+  * Plan module
+  * User module
+  * Coupon engine
+  * Subscription lifecycle
+  * Payment module
+  * Renewal scheduler
+  * Dunning logic
+  * Testing layer
+  * Bug fixes
 
-Validation using @Valid
+---
 
-Global exception handling
+# 🎯 Key Business Features
 
-Clean separation of concerns
+* Idempotent renewal
+* Grace period enforcement
+* Retry logic with configurable intervals
+* Automatic cancellation after max retries
+* Refund handling on downgrade
+* Add-on billing integration
+* Proper transaction management
 
-🎯 Future Improvements
+---
 
-Stripe/Razorpay integration
+# 📌 Project Status
 
-Webhook support
-
-Invoice generation (PDF)
-
-Multi-currency support
-
-Event-driven billing (Kafka)
-
-Admin dashboard UI
-
-👨‍💻 Author
-
-Developed as a complete backend SaaS billing system for learning and production-style architecture practice.
+✅ All tests passing
+✅ Clean architecture
+✅ Retry mechanism implemented
