@@ -3,9 +3,12 @@ package com.example.subscription.controller;
 import com.example.subscription.scheduler.DunningScheduler;
 import com.example.subscription.scheduler.RenewalScheduler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -16,14 +19,24 @@ public class AdminController {
     private final RenewalScheduler renewalScheduler;
     private final DunningScheduler dunningScheduler;
 
-    @PostMapping("/trigger-renewal")
-    public void triggerRenewal(){
-        renewalScheduler.runRenewals();
-    }
+//    @PostMapping("/trigger-renewal")
+//    public void triggerRenewal(){
+//        renewalScheduler.runRenewals();
+//    }
 
+    @PostMapping("/trigger-renewal")
+    public ResponseEntity<Map<String, String>> triggerRenewal() {
+        renewalScheduler.runRenewals();
+        return ResponseEntity.accepted().body(
+                Map.of("message", "Renewal job started")
+        );
+    }
     @PostMapping("/trigger-dunning")
-    public void triggerDunning(){
+    public ResponseEntity<Map<String,String>> triggerDunning(){
         dunningScheduler.runDunning();
+        return ResponseEntity.accepted().body(
+                Map.of("message","Dunning job started")
+        );
     }
 
 }

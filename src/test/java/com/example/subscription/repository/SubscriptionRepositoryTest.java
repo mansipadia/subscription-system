@@ -90,10 +90,13 @@ class SubscriptionRepositoryTest {
 
         entityManager.flush();
 
+        int maxRetries=3;
+
         List<Subscription> result =
                 subscriptionRepository.findSubscriptionsForRetry(
                         SubscriptionStatus.GRACE,
-                        LocalDate.now()
+                        LocalDate.now(),
+                        maxRetries
                 );
 
         assertThat(result).hasSize(1);

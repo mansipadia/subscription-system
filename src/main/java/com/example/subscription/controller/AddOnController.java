@@ -5,6 +5,7 @@ import com.example.subscription.entity.AddOns;
 import com.example.subscription.service.AddOnService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class AddOnController {
     @Autowired
     AddOnService addOnService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public AddOns create(@RequestBody AddOnRequest request){
         return addOnService.createAddOn(request);
