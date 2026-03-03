@@ -79,6 +79,7 @@ class DunningServiceTest {
 
         when(config.getMaxRetries()).thenReturn(3);
 
+        //retry allowed
         when(paymentRepository
                 .existsBySubscriptionIdAndPaymentTypeAndPaymentDate(
                         anyLong(), any(), any()))

@@ -61,8 +61,6 @@ public class SubscriptionAddOnServiceImpl implements SubscriptionAddOnService {
             throw new IllegalStateException("Add-on already attached for this cycle");
         }
         SubscriptionAddOns saved = subscriptionAddOnRepository.save(subscriptionAddOns);
-
-        // Convert to DTO
         SubscriptionAddOnResponse response = new SubscriptionAddOnResponse();
         response.setId(saved.getId());
         response.setSubscriptionId(subscription.getId());

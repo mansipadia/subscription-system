@@ -53,7 +53,7 @@ class SubscriptionServiceTest {
         plan.setDuration_days(30);
 
         Subscription savedSubscription = new Subscription();
-        savedSubscription.setId(10L); // 🔥 IMPORTANT
+        savedSubscription.setId(10L);
         savedSubscription.setUser(user);
         savedSubscription.setPlan(plan);
         savedSubscription.setFinalPrice(BigDecimal.valueOf(100));
